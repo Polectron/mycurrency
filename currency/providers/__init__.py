@@ -2,12 +2,11 @@ import abc
 import datetime
 
 from currency.models import Currency, CurrencyProvider
-from currency.providers.currency_beacon import CurrencyBeaconCurrencyClient
 
 
 class CurrencyClient(abc.ABC):
-    @abc.abstractmethod
     @staticmethod
+    @abc.abstractmethod
     def get_exchange_rate_data(
         source_currency: Currency,
         exchanged_currency: Currency,
@@ -15,8 +14,8 @@ class CurrencyClient(abc.ABC):
     ) -> float:
         raise NotImplementedError
 
-    @abc.abstractmethod
     @staticmethod
+    @abc.abstractmethod
     async def get_exchange_rate_data_async(
         source_currency: Currency,
         exchanged_currency: Currency,
@@ -25,12 +24,23 @@ class CurrencyClient(abc.ABC):
         raise NotImplementedError
 
 
+PROVIDER_CLIENT_REGISTRY: dict[str, type[CurrencyClient]] = {}
+
+
 def _get_provider_client(name: str) -> CurrencyClient:
     """Load provider client class by name"""
-    provider_class = CLIENTS.get(name)
+    provider_class = PROVIDER_CLIENT_REGISTRY.get(name)
     if not provider_class:
         raise ValueError(f"Provider client {name} not found in registry")
     return provider_class()
+
+
+def register_provider_client(name: str):
+    def decorator(cls: type[CurrencyClient]):
+        PROVIDER_CLIENT_REGISTRY[name] = cls
+        return cls
+
+    return decorator
 
 
 def get_exchange_rate_data(
@@ -43,9 +53,6 @@ def get_exchange_rate_data(
     return client.get_exchange_rate_data(
         source_currency, exchanged_currency, valuation_date
     )
-
-
-CLIENTS = {"CurrencyBeacon": CurrencyBeaconCurrencyClient}
 
 
 def get_exchange_rate_data_smart(

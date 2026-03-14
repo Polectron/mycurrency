@@ -3,11 +3,11 @@ import datetime
 import httpx
 import requests
 
-from currency.providers import CurrencyClient
+from currency.providers import CurrencyClient, register_provider_client
 from currency.models import Currency
 from django.conf import settings
 
-
+@register_provider_client("CurrencyBeacon")
 class CurrencyBeaconCurrencyClient(CurrencyClient):
     @staticmethod
     def get_exchange_rate_data(
