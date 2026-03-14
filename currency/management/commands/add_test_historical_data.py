@@ -66,7 +66,12 @@ class Command(BaseCommand):
                 ),
             )
         
-        CurrencyExchangeRate.objects.bulk_create(historical_data)
+        CurrencyExchangeRate.objects.bulk_create(
+            historical_data,
+            update_conflicts=True,
+            update_fields=['rate_value'],
+            unique_fields=['source_currency', 'exchanged_currency', 'valuation_date']
+        )
 
         self.stdout.write(
             self.style.SUCCESS(f"Successfully inserted mock historical data: {len(historical_data)} rows")
