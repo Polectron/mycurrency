@@ -1,0 +1,241 @@
+{
+  "info": {
+    "_postman_id": "b4e783cc-48c3-46db-9acf-a76d1309fdb0",
+    "name": "mycurrency",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "14645960"
+  },
+  "item": [
+    {
+      "name": "v1",
+      "item": [
+        {
+          "name": "currencies",
+          "item": [
+            {
+              "name": "Get all",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{SERVER}}/v1/currencies/",
+                  "host": [
+                    "{{SERVER}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "currencies",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{SERVER}}/v1/currencies/3/",
+                  "host": [
+                    "{{SERVER}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "currencies",
+                    "3",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Add",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"code\": \"BTC\",\r\n    \"name\": \"Bitcoin\",\r\n    \"symbol\": \"₿\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{SERVER}}/v1/currencies/",
+                  "host": [
+                    "{{SERVER}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "currencies",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Euro coin\",\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{SERVER}}/v1/currencies/1/",
+                  "host": [
+                    "{{SERVER}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "currencies",
+                    "1",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get detail",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{SERVER}}/v1/currencies/1/",
+                  "host": [
+                    "{{SERVER}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "currencies",
+                    "1",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Currency rates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{SERVER}}/v1/rates/?source_currency=GBP&date_from=2026-03-10&date_to=2026-03-15",
+              "host": [
+                "{{SERVER}}"
+              ],
+              "path": [
+                "v1",
+                "rates",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "source_currency",
+                  "value": "GBP"
+                },
+                {
+                  "key": "date_from",
+                  "value": "2026-03-10"
+                },
+                {
+                  "key": "date_to",
+                  "value": "2026-03-15"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Convert",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{SERVER}}/v1/convert/?source_currency=GBP&exchanged_currency=CHF&amount=1",
+              "host": [
+                "{{SERVER}}"
+              ],
+              "path": [
+                "v1",
+                "convert",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "source_currency",
+                  "value": "GBP"
+                },
+                {
+                  "key": "exchanged_currency",
+                  "value": "CHF"
+                },
+                {
+                  "key": "amount",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "password",
+        "value": "admin123",
+        "type": "string"
+      },
+      {
+        "key": "username",
+        "value": "admin",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
