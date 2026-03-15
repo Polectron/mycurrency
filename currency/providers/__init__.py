@@ -6,7 +6,7 @@ import httpx
 import requests
 from django.conf import settings
 
-from currency.models import Currency, CurrencyExchangeRate, CurrencyProvider
+from currency.models import Currency, CurrencyProvider
 
 
 class CurrencyClient(abc.ABC):
