@@ -49,5 +49,14 @@
             "name": "British Pound",
             "symbol": "£"
         }
+    },
+    {
+        "model": "currency.currencyprovider",
+        "pk": 1,
+        "fields": {
+            "name": "CurrencyBeacon",
+            "active": true,
+            "priority": 1.0
+        }
     }
 ]
