@@ -1,0 +1,60 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div id="content-main">   
+    <form method="post">
+        {% csrf_token %}
+        <div class="module">
+            <table>
+                <tr>
+                    <th><label for="from_currency">From:</label></th>
+                    <td>
+                        <select name="from_currency" id="from_currency">
+                            {% for currency in currencies %}
+                                <option value="{{ currency.code }}">{{ currency.code }} - {{ currency.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="to_currency">To:</label></th>
+                    <td>
+                        <select name="to_currency" id="to_currency" multiple>
+                            {% for currency in currencies %}
+                                <option value="{{ currency.code }}">{{ currency.code }} - {{ currency.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="amount">Amount:</label></th>
+                    <td><input type="number" name="amount" id="amount" step="0.01" required value="{{ amount|default:'' }}"></td>
+                </tr>
+                {% if results %}
+                <tr>
+                    <th>Results:</th>
+                    <td>
+                        <ul style="list-style: none; padding: 0;">
+                            {% for result in results %}
+                                <li style="margin: 5px 0;">
+                                    <strong>{{ amount }} {{ result.from }} = {{ result.converted_amount|floatformat:2 }} {{ result.to }}</strong> (Rate: {{ result.exchange_rate|floatformat:6 }})
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                {% elif error %}
+                <tr>
+                    <th>Error:</th>
+                    <td style="color: red;">{{ error }}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="Convert" class="default">
+        </div>
+    </form>
+</div>
+{% endblock %}
