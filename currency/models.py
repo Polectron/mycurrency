@@ -23,26 +23,14 @@ class CurrencyExchangeRate(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['source_currency', 'exchanged_currency', 'valuation_date'],
-                name='unique_currency_exchange_rate'
+                fields=["source_currency", "exchanged_currency", "valuation_date"],
+                name="unique_currency_exchange_rate",
             )
         ]
 
-    def save(self, *args, **kwargs):
-        # Use update_or_create pattern to overwrite existing records on unique constraint
-        if not self.pk:
-            obj, _ = CurrencyExchangeRate.objects.update_or_create(
-                source_currency=self.source_currency,
-                exchanged_currency=self.exchanged_currency,
-                valuation_date=self.valuation_date,
-                defaults={'rate_value': self.rate_value}
-            )
-            self.pk = obj.pk
-        else:
-            super().save(*args, **kwargs)
-
     def __str__(self):
-        return f"Exchange {self.source_currency.code} to {self.source_currency.code} ({self.valuation_date})"
+        return f"Exchange {self.source_currency.code} to {self.exchanged_currency.code} ({self.valuation_date})"
+
 
 class CurrencyProvider(models.Model):
     id = models.BigAutoField(primary_key=True)
