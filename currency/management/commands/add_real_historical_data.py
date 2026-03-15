@@ -55,7 +55,7 @@ async def get_data_worker(
                 source_currency, exchanged_currency, valuation_date, provider
             )
             async with lock:
-                print(f"Storing data for {source_currency} {exchanged_currency} {valuation_date} -> {exchange_rate}")
+                print(f"Storing data for {source_currency} {exchanged_currency} to {valuation_date} -> {exchange_rate}")
                 historical_data.append(
                     CurrencyExchangeRate(
                         source_currency=source_currency,
@@ -64,6 +64,8 @@ async def get_data_worker(
                         rate_value=exchange_rate,
                     )
                 )
+        except Exception as e:
+            print(f"Error processing {source_currency} -> {exchanged_currency} on {valuation_date}: {e}")
         finally:
             queue.task_done()
 
@@ -95,8 +97,6 @@ class Command(BaseCommand):
         asyncio.run(
             setup_workers(n_workers, from_date, to_date, historical_data, provider, currencies)
         )
-
-        # asyncio.run(asyncio.sleep(5))
 
         CurrencyExchangeRate.objects.bulk_create(
             historical_data,
