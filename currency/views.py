@@ -1,12 +1,14 @@
 import datetime
 from decimal import Decimal
 
+from django.db import transaction
 from django.forms import ValidationError
 from rest_framework import generics, permissions, viewsets, views
 from rest_framework.response import Response
 from rest_framework.request import Request
 
 from currency.models import Currency, CurrencyExchangeRate
+from currency.providers import get_exchange_rate_data_smart
 from currency.serializers import CurrencySerializer, CurrencyExchangeRateSerializer
 
 
@@ -19,14 +21,14 @@ class CurrencyRatesView(generics.ListAPIView):
     serializer_class = CurrencyExchangeRateSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self): # type: ignore
+    def get_queryset(self):  # type: ignore
         """
         Return a list of currency rates.
         """
         queryset = CurrencyExchangeRate.objects.all()
-        source_currency_code = self.request.query_params.get("source_currency") # type: ignore
-        date_from = self.request.query_params.get("date_from") # type: ignore
-        date_to = self.request.query_params.get("date_to") # type: ignore
+        source_currency_code = self.request.query_params.get("source_currency")  # type: ignore
+        date_from = self.request.query_params.get("date_from")  # type: ignore
+        date_to = self.request.query_params.get("date_to")  # type: ignore
 
         missing = []
         if not source_currency_code:
@@ -37,10 +39,12 @@ class CurrencyRatesView(generics.ListAPIView):
             missing.append("date_to")
 
         if missing:
-            raise ValidationError({field: "This parameter is required." for field in missing})
+            raise ValidationError(
+                {field: "This parameter is required." for field in missing}
+            )
 
         currency = Currency.objects.filter(code=source_currency_code).get()
-        
+
         queryset = queryset.filter(source_currency=currency.id)
         queryset = queryset.filter(valuation_date__gte=date_from)
         queryset = queryset.filter(valuation_date__lte=date_to)
@@ -72,15 +76,43 @@ class CurrencyConvertView(views.APIView):
             return Response({"error": "Invalid amount parameter"}, status=422)
         exchanged_currency_code = request.query_params.get("exchanged_currency")
 
-        exchange_rate = CurrencyExchangeRate.objects.filter(source_currency=source_currency_code, valuation_date=datetime.date.today()).get()
+        source_currency = Currency.objects.filter(code=source_currency_code).get()
+        exchanged_currency = Currency.objects.filter(code=exchanged_currency_code).get()
+        valuation_date = datetime.date.today()
 
-        converted_amount = amount * exchange_rate.rate_value
+        if source_currency == exchanged_currency:
+            exchange_rate_value = 1
+        else:
+            exchange_rate: CurrencyExchangeRate | None = None
+            try:
+                exchange_rate = CurrencyExchangeRate.objects.filter(
+                    source_currency=source_currency,
+                    exchanged_currency=exchanged_currency,
+                    valuation_date=valuation_date,
+                ).get()
+                exchange_rate_value = exchange_rate.rate_value
+            except CurrencyExchangeRate.DoesNotExist:
+                exchange_rate_value = Decimal(
+                    get_exchange_rate_data_smart(
+                        source_currency=source_currency,
+                        exchanged_currency=exchanged_currency,
+                        valuation_date=valuation_date,
+                    )
+                )
+                CurrencyExchangeRate.objects.update_or_create(
+                    source_currency=source_currency,
+                    exchanged_currency=exchanged_currency,
+                    valuation_date=valuation_date,
+                    rate_value=exchange_rate_value,
+                )
+
+        converted_amount = amount * exchange_rate_value
 
         return Response(
             {
                 "source_currency": source_currency_code,
                 "original_amount": amount,
-                "rate_value": exchange_rate.rate_value,
+                "rate_value": exchange_rate_value,
                 "exchanged_currency": exchanged_currency_code,
                 "converted_amount": converted_amount,
             }
