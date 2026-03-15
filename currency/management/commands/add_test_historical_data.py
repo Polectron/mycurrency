@@ -4,7 +4,7 @@ from multiprocessing.pool import ThreadPool
 import threading
 from django.core.management.base import BaseCommand
 from currency.models import Currency, CurrencyExchangeRate
-from currency.providers.mock import MockCurrencyClient
+from currency.providers import MockCurrencyClient
 
 
 def get_data(
