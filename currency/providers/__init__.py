@@ -44,6 +44,7 @@ class CurrencyBeaconCurrencyClient(CurrencyClient):
         }
         if valuation_date == datetime.date.today():
             url = "https://api.currencybeacon.com/v1/latest"
+        else:
             params["date"] = valuation_date.isoformat()
         return url, params
 
