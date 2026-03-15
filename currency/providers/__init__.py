@@ -54,7 +54,9 @@ class CurrencyBeaconCurrencyClient(CurrencyClient):
         exchanged_currency: Currency,
         valuation_date: datetime.date,
     ) -> float:
-        url, params = CurrencyBeaconCurrencyClient.build_query(source_currency, exchanged_currency, valuation_date)
+        url, params = CurrencyBeaconCurrencyClient.build_query(
+            source_currency, exchanged_currency, valuation_date
+        )
         response = requests.get(
             url,
             params=params,
@@ -70,7 +72,9 @@ class CurrencyBeaconCurrencyClient(CurrencyClient):
         valuation_date: datetime.date,
     ) -> float:
         async with httpx.AsyncClient() as client:
-            url, params = CurrencyBeaconCurrencyClient.build_query(source_currency, exchanged_currency, valuation_date)
+            url, params = CurrencyBeaconCurrencyClient.build_query(
+                source_currency, exchanged_currency, valuation_date
+            )
             response = await client.get(
                 url,
                 params=params,
@@ -100,9 +104,30 @@ class MockCurrencyClient(CurrencyClient):
         raise NotImplementedError
 
 
+class FailingMockCurrencyClient(CurrencyClient):
+    """A mock client that always fails useful for testing failover logic"""
+
+    @staticmethod
+    def get_exchange_rate_data(
+        source_currency: Currency,
+        exchanged_currency: Currency,
+        valuation_date: datetime.date,
+    ) -> float:
+        raise Exception("Provider failed")
+
+    @staticmethod
+    async def get_exchange_rate_data_async(
+        source_currency: Currency,
+        exchanged_currency: Currency,
+        valuation_date: datetime.date,
+    ) -> float:
+        raise Exception("Provider failed")
+
+
 PROVIDER_CLIENTS: dict[str, type[CurrencyClient]] = {
     "CurrencyBeacon": CurrencyBeaconCurrencyClient,
     "MockCurrencyClient": MockCurrencyClient,
+    "FailingMockCurrencyClient": FailingMockCurrencyClient,
 }
 
 
