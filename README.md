@@ -52,3 +52,5 @@ True parallelism with multiprocessing would be appropriate for CPU-bound tasks l
 - Implement better authentication methods to the API like oauth2 or at least the simple token authentication provided by DRF
 - Add API limits like requests per second
 - Add a circuit breaker for the providers when failuers are detected
+- Add CI/CD pipeline for ensuring code quality and that all tests pass
+- Add pagination in currency rates timeseries endpoint
