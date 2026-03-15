@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 
 from currency.models import Currency, CurrencyExchangeRate
-from currency.providers import get_exchange_rate_data_smart
 from currency.serializers import CurrencySerializer, CurrencyExchangeRateSerializer
+from currency.services import get_exchange_rate
 
 
 # Currency rates list Service to retrieve a List of currency rates for a specific time period
@@ -79,33 +79,7 @@ class CurrencyConvertView(views.APIView):
         exchanged_currency = Currency.objects.filter(code=exchanged_currency_code).get()
         valuation_date = datetime.date.today()
 
-        if source_currency == exchanged_currency:
-            exchange_rate_value = 1
-        else:
-            exchange_rate: CurrencyExchangeRate | None = None
-            try:
-                exchange_rate = CurrencyExchangeRate.objects.filter(
-                    source_currency=source_currency,
-                    exchanged_currency=exchanged_currency,
-                    valuation_date=valuation_date,
-                ).get()
-                exchange_rate_value = exchange_rate.rate_value
-            except CurrencyExchangeRate.DoesNotExist:
-                exchange_rate_value = Decimal(
-                    get_exchange_rate_data_smart(
-                        source_currency=source_currency,
-                        exchanged_currency=exchanged_currency,
-                        valuation_date=valuation_date,
-                    )
-                )
-                CurrencyExchangeRate.objects.update_or_create(
-                    source_currency=source_currency,
-                    exchanged_currency=exchanged_currency,
-                    valuation_date=valuation_date,
-                    rate_value=exchange_rate_value,
-                )
-
-        converted_amount = amount * exchange_rate_value
+        exchange_rate_value = get_exchange_rate(source_currency, exchanged_currency, valuation_date, amount)
 
         return Response(
             {
@@ -113,7 +87,7 @@ class CurrencyConvertView(views.APIView):
                 "original_amount": amount,
                 "rate_value": exchange_rate_value,
                 "exchanged_currency": exchanged_currency_code,
-                "converted_amount": converted_amount,
+                "converted_amount": amount * exchange_rate_value,
             }
         )
 
