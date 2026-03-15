@@ -12,7 +12,6 @@ from currency.services import get_exchange_rate
 
 
 class CurrencyAdmin(admin.ModelAdmin):
-
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -45,18 +44,20 @@ class CurrencyAdmin(admin.ModelAdmin):
                     results = []
 
                     for to_code in to_currency_codes:
-                            exchanged_currency = Currency.objects.filter(code=to_code).get()
+                        exchanged_currency = Currency.objects.filter(code=to_code).get()
 
-                            exchange_rate_value = get_exchange_rate(source_currency, exchanged_currency, valuation_date, amount)
+                        exchange_rate_value = get_exchange_rate(
+                            source_currency, exchanged_currency, valuation_date
+                        )
 
-                            results.append(
-                                {
-                                    "from": from_currency_code,
-                                    "to": to_code,
-                                    "exchange_rate": exchange_rate_value,
-                                    "converted_amount": amount * exchange_rate_value,
-                                }
-                            )
+                        results.append(
+                            {
+                                "from": from_currency_code,
+                                "to": to_code,
+                                "exchange_rate": exchange_rate_value,
+                                "converted_amount": amount * exchange_rate_value,
+                            }
+                        )
 
                     context["results"] = results
                     context["amount"] = amount

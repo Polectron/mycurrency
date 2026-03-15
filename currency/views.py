@@ -79,7 +79,9 @@ class CurrencyConvertView(views.APIView):
         exchanged_currency = Currency.objects.filter(code=exchanged_currency_code).get()
         valuation_date = datetime.date.today()
 
-        exchange_rate_value = get_exchange_rate(source_currency, exchanged_currency, valuation_date, amount)
+        exchange_rate_value = get_exchange_rate(
+            source_currency, exchanged_currency, valuation_date
+        )
 
         return Response(
             {
