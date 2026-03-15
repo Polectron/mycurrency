@@ -101,7 +101,8 @@ class MockCurrencyClient(CurrencyClient):
 
 
 PROVIDER_CLIENTS: dict[str, type[CurrencyClient]] = {
-    "CurrencyBeacon": CurrencyBeaconCurrencyClient
+    "CurrencyBeacon": CurrencyBeaconCurrencyClient,
+    "MockCurrencyClient": MockCurrencyClient,
 }
 
 
