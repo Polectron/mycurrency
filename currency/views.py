@@ -48,7 +48,7 @@ class CurrencyRatesView(generics.ListAPIView):
         queryset = queryset.filter(valuation_date__gte=date_from)
         queryset = queryset.filter(valuation_date__lte=date_to)
 
-        return queryset
+        return queryset.order_by("-valuation_date")
 
 
 # Convert amount
